@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aduk's Job Finder</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Aduk's Job Finder</h1>
+        <p>Search real jobs from LinkedIn, Indeed, Glassdoor & more</p>
+    </header>
+
+    <main>
+        <section class="search-box">
+            <div class="search-row">
+                <input type="text" id="query" placeholder="Job title or keyword (e.g. Software Engineer)" />
+                <input type="text" id="location" placeholder="Location (e.g. Nairobi, Remote)" />
+            </div>
+            <div class="filter-row">
+                <select id="job_type">
+                    <option value="">All Job Types</option>
+                    <option value="FULLTIME">Full-Time</option>
+                    <option value="PARTTIME">Part-Time</option>
+                    <option value="CONTRACTOR">Contract</option>
+                    <option value="INTERN">Internship</option>
+                </select>
+                <select id="sort_by">
+                    <option value="date">Sort by Date</option>
+                    <option value="salary">Sort by Salary</option>
+                </select>
+                <button id="search-btn" onclick="searchJobs()">Search Jobs</button>
+            </div>
+        </section>
+
+        <section id="status-bar" class="hidden"></section>
+
+        <section id="results-container">
+            <div id="results-grid"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Powered by <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank">JSearch API</a> &mdash; Built by Aduk</p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
