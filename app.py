@@ -7,12 +7,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "d0cf81360emshdce6def090048cdp1f086ejsn966b39af2e7a")
+RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
 JSEARCH_URL = "https://jsearch.p.rapidapi.com/search"
-HEADERS = {
-    "X-RapidAPI-Key": RAPIDAPI_KEY,
-    "X-RapidAPI-Host": "jsearch.p.rapidapi.com"
-}
 
 @app.route("/")
 def index():
@@ -28,6 +24,14 @@ def search():
     if not query:
         return jsonify({"error": "Please enter a job title or keyword."}), 400
 
+    if not RAPIDAPI_KEY:
+        return jsonify({"error": "API key not configured."}), 500
+
+    headers = {
+        "X-RapidAPI-Key": RAPIDAPI_KEY,
+        "X-RapidAPI-Host": "jsearch.p.rapidapi.com"
+    }
+
     search_query = f"{query} in {location}" if location else query
 
     params = {
@@ -40,7 +44,7 @@ def search():
         params["employment_types"] = job_type
 
     try:
-        response = requests.get(JSEARCH_URL, headers=HEADERS, params=params, timeout=20)
+        response = requests.get(JSEARCH_URL, headers=headers, params=params, timeout=20)
         response.raise_for_status()
         data = response.json()
 
@@ -56,10 +60,10 @@ def search():
             results.append({
                 "title": job.get("job_title", "N/A"),
                 "company": job.get("employer_name", "N/A"),
-                "location": ", ".join(filter(None, [job.get("job_city"), job.get("job_country")])) or "N/A",
+                "location": ", ".join(filter(None, [job.get("job_city"), job.get("job_state"), job.get("job_country")])) or "Remote/Unspecified",
                 "type": job.get("job_employment_type", "N/A"),
-                "salary": f"${job['job_min_salary']:,.0f} - ${job['job_max_salary']:,.0f}" if job.get("job_min_salary") and job.get("job_max_salary") else "Not disclosed",
-                "posted": job.get("job_posted_at_datetime_utc", "N/A")[:10] if job.get("job_posted_at_datetime_utc") else "N/A",
+                "salary": f"${job.get('job_min_salary') or 0:,.0f} - ${job.get('job_max_salary') or 0:,.0f}" if job.get("job_min_salary") and job.get("job_max_salary") else "Not disclosed",
+                "posted": (job.get("job_posted_at_datetime_utc") or "")[:10] or "Recently posted",
                 "apply_link": job.get("job_apply_link", "#"),
                 "description": (job.get("job_description") or "")[:300] + "..."
             })
