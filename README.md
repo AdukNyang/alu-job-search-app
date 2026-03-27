@@ -1,28 +1,25 @@
 # Aduk's Job Finder
 
-A web application that allows users to search for real job listings from platforms like LinkedIn, Indeed, and Glassdoor using the JSearch API. Users can filter by keyword, location, job type, and sort results by date or salary.
+Live Demo: http://54.152.31.168
 
-## Features
+Demo Video: (link here)
 
-- Search jobs by keyword, location, and job type
+A web app that lets you search for real jobs from LinkedIn, Indeed, Glassdoor and more. You can filter by keyword, location, and job type, sort by date or salary, and click straight through to apply. Built with Flask and the JSearch API for my Web Infrastructure summative at ALU.
+
+## What It Does
+
+Search jobs with:
+
+- Filter by keyword, location, and job type
 - Sort results by date or salary
-- Displays job title, company, location, salary, date posted, description, and apply link
-- Error handling for API downtime and invalid responses
-- Responsive UI
+- See job title, company, location, salary, date posted, and a short description
+- Click "Apply Now" to go straight to the job listing
+- Error handling — if the API is down or returns nothing, you get a clear message instead of a broken page
+- Works on mobile and desktop
 
-## APIs Used
+## How To Run It Locally
 
-- **JSearch API** via [RapidAPI](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch) — provides job listings from LinkedIn, Indeed, Glassdoor, and more.
-
-## How to Run Locally
-
-### Prerequisites
-- Python 3.x
-- pip
-
-### Steps
-
-1. Clone the repository:
+1. Clone the repo:
    ```bash
    git clone https://github.com/AdukNyang/alu-job-search-app.git
    cd alu-job-search-app
@@ -33,30 +30,39 @@ A web application that allows users to search for real job listings from platfor
    pip3 install -r requirements.txt
    ```
 
-3. Create a `.env` file in the root directory and add your API key:
+3. Create a `.env` file and add your API key:
    ```
    RAPIDAPI_KEY=your_api_key_here
    ```
 
-4. Run the app:
+4. Start the app:
    ```bash
    python3 app.py
    ```
 
-5. Open your browser and go to `http://127.0.0.1:5000`
+5. Open `http://127.0.0.1:5000` in your browser — that's it.
+
+## What's In The Code
+
+- `app.py`: Flask backend. Handles the `/search` route, calls the JSearch API, sorts results, and returns JSON.
+- `templates/index.html`: The main page — search form and results grid.
+- `static/style.css`: All the styling (blue theme, responsive card grid).
+- `static/script.js`: Handles the search button, Enter key, fetches results, and renders job cards.
+- `requirements.txt`: Flask, requests, python-dotenv.
+- `.env`: Stores the API key — not in the repo.
 
 ## Deployment
 
-The application is deployed on two web servers with a load balancer distributing traffic between them.
+I deployed the app on two web servers and set up a load balancer to split traffic between them.
 
 ### Servers
 - **web-01**: `3.86.250.240`
 - **web-02**: `54.152.16.128`
 - **lb-01 (Load Balancer)**: `54.152.31.168`
 
-### Steps Taken on Each Web Server (web-01 and web-02)
+### What I did on each web server
 
-1. SSH into the server:
+1. SSH in:
    ```bash
    ssh -i ~/.ssh/school ubuntu@<server-ip>
    ```
@@ -66,23 +72,19 @@ The application is deployed on two web servers with a load balancer distributing
    sudo apt update && sudo apt install git python3-pip -y
    ```
 
-3. Clone the repository:
+3. Clone the repo and install dependencies:
    ```bash
    git clone https://github.com/AdukNyang/alu-job-search-app.git
    cd alu-job-search-app
-   ```
-
-4. Install dependencies:
-   ```bash
    pip3 install -r requirements.txt
    ```
 
-5. Create the `.env` file:
+4. Add the `.env` file:
    ```bash
    echo "RAPIDAPI_KEY=your_api_key_here" > .env
    ```
 
-6. Configure Nginx as a reverse proxy:
+5. Set up Nginx as a reverse proxy so Flask is accessible from outside:
    ```bash
    sudo tee /etc/nginx/sites-available/job-search << 'EOF'
    server {
@@ -99,14 +101,14 @@ The application is deployed on two web servers with a load balancer distributing
    sudo nginx -t && sudo systemctl restart nginx
    ```
 
-7. Start Flask in the background:
+6. Start Flask in the background:
    ```bash
    nohup python3 app.py &
    ```
 
-### Load Balancer Configuration (lb-01)
+### Load balancer setup (lb-01)
 
-HAProxy was configured to distribute traffic between web-01 and web-02 using round-robin:
+Used HAProxy with round-robin to split traffic evenly between the two servers:
 
 ```bash
 sudo tee /etc/haproxy/haproxy.cfg << 'EOF'
@@ -141,17 +143,40 @@ EOF
 sudo systemctl restart haproxy
 ```
 
-Access the app via the load balancer at: `http://54.152.31.168`
+Access the app through the load balancer: `http://54.152.31.168`
 
-## Challenges
+## Challenges I Ran Into
 
-- **pip not found on servers**: Had to install `python3-pip` manually before installing dependencies.
-- **Flask only binding to localhost**: Nginx reverse proxy was needed to expose Flask to the outside world.
-- **API returning unexpected results**: Some job postings have missing fields (location, date, salary) — handled with fallback values like `N/A` and `Not disclosed`.
+- **pip wasn't installed on the servers** — had to install `python3-pip` before anything else would work.
+- **Flask only ran on localhost** — it wasn't reachable from outside until I set up Nginx as a reverse proxy in front of it.
+- **Some jobs have missing data** — the API sometimes returns listings without a location, date, or salary. Handled that with fallbacks (`N/A`, `Not disclosed`) so the app doesn't break.
+
+## Why This Way?
+
+- **Flask**: Lightweight and straightforward for a small API-driven app.
+- **Nginx + HAProxy**: Nginx handles the reverse proxy on each server, HAProxy handles load balancing — same setup I've been learning in the Web Infrastructure track.
+- **JSearch API**: Aggregates jobs from multiple platforms in one call, so users get broader results without needing multiple API integrations.
+
+## Technologies
+
+- Python 3 / Flask
+- HTML5, CSS3, Vanilla JavaScript
+- JSearch API (via RapidAPI)
+- Nginx (reverse proxy)
+- HAProxy (load balancer)
 
 ## Credits
 
 - [JSearch API](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch) by letscrape on RapidAPI
-- [Flask](https://flask.palletsprojects.com/) — Python web framework
-- [HAProxy](https://www.haproxy.org/) — Load balancer
-- [Nginx](https://nginx.org/) — Reverse proxy
+- [Flask](https://flask.palletsprojects.com/)
+- [HAProxy](https://www.haproxy.org/)
+- [Nginx](https://nginx.org/)
+
+## Contact
+
+Email: a.nyang@alustudent.com  
+GitHub: AdukNyang
+
+## License
+
+Educational project for ALU coursework.
