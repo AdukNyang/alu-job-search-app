@@ -1,6 +1,6 @@
 # Aduk's Job Finder
 
-Live Demo: https://aduk7057.tech
+Live Demo: https://aduk7057.tech (DNS still propagating, use this alternative: http://54.152.31.168)
 
 Demo Video: https://www.loom.com/share/a957522b66e34a9896af3afe1d95276e
 
