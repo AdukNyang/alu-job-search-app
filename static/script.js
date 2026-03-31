@@ -51,13 +51,13 @@ function renderJobs(jobs) {
             <h3>${job.title}</h3>
             <div class="company">${job.company}</div>
             <div class="meta">
-                <span>📍 ${job.location}</span>
-                <span>💼 ${job.type}</span>
-                <span>📅 ${job.posted}</span>
+                <span>Location: ${job.location}</span>
+                <span>Type: ${job.type}</span>
+                <span>Posted: ${job.posted}</span>
             </div>
-            <div class="salary">💰 ${job.salary}</div>
+            <div class="salary">Salary: ${job.salary}</div>
             <div class="description">${job.description}</div>
-            <a href="${job.apply_link}" target="_blank">Apply Now →</a>
+            <a href="${job.apply_link}" target="_blank">Apply Now</a>
         </div>
     `).join("");
 }
