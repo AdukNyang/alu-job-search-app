@@ -1,8 +1,8 @@
 # Aduk's Job Finder
 
-Live Demo: http://54.152.31.168
+Live Demo: https://aduk7057.tech
 
-Demo Video: (link here)
+Demo Video: https://www.loom.com/share/a957522b66e34a9896af3afe1d95276e
 
 A web app that lets you search for real jobs from LinkedIn, Indeed, Glassdoor and more. You can filter by keyword, location, and job type, sort by date or salary, and click straight through to apply. Built with Flask and the JSearch API for my Web Infrastructure summative at ALU.
 
@@ -111,6 +111,9 @@ I deployed the app on two web servers and set up a load balancer to split traffi
 Used HAProxy with round-robin to split traffic evenly between the two servers:
 
 ```bash
+# Combine SSL certificate and private key into one file for HAProxy
+sudo cat /etc/letsencrypt/live/www.aduk7057.tech/fullchain.pem /etc/letsencrypt/live/www.aduk7057.tech/privkey.pem | sudo tee /etc/haproxy/aduk7057.pem
+
 sudo tee /etc/haproxy/haproxy.cfg << 'EOF'
 global
     log /dev/log local0
@@ -135,6 +138,10 @@ frontend web-frontend
     bind *:80
     default_backend web-backend
 
+frontend web-frontend-https
+    bind *:443 ssl crt /etc/haproxy/aduk7057.pem
+    default_backend web-backend
+
 backend web-backend
     balance roundrobin
     server web-01 3.86.250.240:80 check
@@ -143,7 +150,7 @@ EOF
 sudo systemctl restart haproxy
 ```
 
-Access the app through the load balancer: `http://54.152.31.168`
+Access the app through the load balancer: `https://aduk7057.tech`
 
 ## Challenges I Ran Into
 
@@ -164,6 +171,8 @@ Access the app through the load balancer: `http://54.152.31.168`
 - JSearch API (via RapidAPI)
 - Nginx (reverse proxy)
 - HAProxy (load balancer)
+- Let's Encrypt (SSL certificate)
+- Domain: aduk7057.tech
 
 ## Credits
 

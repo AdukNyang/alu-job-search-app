@@ -7,7 +7,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
+RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "d0cf81360emshdce6def090048cdp1f086ejsn966b39af2e7a")
 JSEARCH_URL = "https://jsearch.p.rapidapi.com/search"
 
 @app.route("/")
@@ -23,9 +23,6 @@ def search():
 
     if not query:
         return jsonify({"error": "Please enter a job title or keyword."}), 400
-
-    if not RAPIDAPI_KEY:
-        return jsonify({"error": "API key not configured."}), 500
 
     headers = {
         "X-RapidAPI-Key": RAPIDAPI_KEY,
