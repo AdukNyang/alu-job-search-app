@@ -1,14 +1,17 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import os
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
 
-RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "d0cf81360emshdce6def090048cdp1f086ejsn966b39af2e7a")
+RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
 JSEARCH_URL = "https://jsearch.p.rapidapi.com/search"
+CACHE = {}
+CACHE_TTL = 300
 
 @app.route("/")
 def index():
@@ -23,6 +26,12 @@ def search():
 
     if not query:
         return jsonify({"error": "Please enter a job title or keyword."}), 400
+
+    cache_key = f"{query}_{location}_{job_type}_{sort_by}"
+    if cache_key in CACHE:
+        cached_time, cached_data = CACHE[cache_key]
+        if time.time() - cached_time < CACHE_TTL:
+            return jsonify(cached_data)
 
     headers = {
         "X-RapidAPI-Key": RAPIDAPI_KEY,
@@ -65,7 +74,9 @@ def search():
                 "description": (job.get("job_description") or "")[:300] + "..."
             })
 
-        return jsonify({"jobs": results, "count": len(results)})
+        response_data = {"jobs": results, "count": len(results)}
+        CACHE[cache_key] = (time.time(), response_data)
+        return jsonify(response_data)
 
     except requests.exceptions.Timeout:
         return jsonify({"error": "Request timed out. Please try again."}), 504

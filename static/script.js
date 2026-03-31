@@ -45,19 +45,25 @@ function searchJobs() {
         });
 }
 
+function sanitize(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 function renderJobs(jobs) {
     resultsGrid.innerHTML = jobs.map(job => `
         <div class="job-card">
-            <h3>${job.title}</h3>
-            <div class="company">${job.company}</div>
+            <h3>${sanitize(job.title)}</h3>
+            <div class="company">${sanitize(job.company)}</div>
             <div class="meta">
-                <span>Location: ${job.location}</span>
-                <span>Type: ${job.type}</span>
-                <span>Posted: ${job.posted}</span>
+                <span>Location: ${sanitize(job.location)}</span>
+                <span>Type: ${sanitize(job.type)}</span>
+                <span>Posted: ${sanitize(job.posted)}</span>
             </div>
-            <div class="salary">Salary: ${job.salary}</div>
-            <div class="description">${job.description}</div>
-            <a href="${job.apply_link}" target="_blank">Apply Now</a>
+            <div class="salary">Salary: ${sanitize(job.salary)}</div>
+            <div class="description">${sanitize(job.description)}</div>
+            <a href="${sanitize(job.apply_link)}" target="_blank">Apply Now</a>
         </div>
     `).join("");
 }
